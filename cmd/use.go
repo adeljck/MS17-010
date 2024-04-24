@@ -23,6 +23,16 @@ func init() {
 		},
 	})
 	useCommand.AddCommand(&grumble.Command{
+		Name:     "EternalChampion",
+		Help:     "use EternalChampion",
+		LongHelp: "use EternalChampion",
+		Usage:    "use EternalChampion",
+		Run: func(c *grumble.Context) error {
+			exploits.EternalChampion()
+			return nil
+		},
+	})
+	useCommand.AddCommand(&grumble.Command{
 		Name:     "SmbTouch",
 		Help:     "use SmbTouch",
 		LongHelp: "use SmbTouch",
@@ -39,6 +49,16 @@ func init() {
 		Usage:    "use Doublepulsar",
 		Run: func(c *grumble.Context) error {
 			exploits.Doublepulsar()
+			return nil
+		},
+	})
+	useCommand.AddCommand(&grumble.Command{
+		Name:     "EternalRomance",
+		Help:     "use EternalRomance",
+		LongHelp: "use EternalRomance",
+		Usage:    "use EternalRomance",
+		Run: func(c *grumble.Context) error {
+			exploits.EternalRomance()
 			return nil
 		},
 	})
