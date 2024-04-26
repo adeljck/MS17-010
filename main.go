@@ -1,8 +1,6 @@
 package main
 
-import (
-	"eternal/modules"
-)
+import "eternal/modules"
 
 func main() {
 	modules.Run()

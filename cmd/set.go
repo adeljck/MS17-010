@@ -41,16 +41,6 @@ func init() {
 			return nil
 		},
 	})
-	setCommand.AddCommand(&grumble.Command{
-		Name:     "Protocol",
-		Help:     "set Protocol",
-		LongHelp: "set Protocol",
-		Usage:    "set Protocol",
-		Run: func(c *grumble.Context) error {
-			metatdatas.MetaData.SetProtocol()
-			return nil
-		},
-	})
 	//setCommand.AddCommand(&grumble.Command{
 	//	Name:     "Target",
 	//	Help:     "set Target",

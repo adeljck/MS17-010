@@ -7,7 +7,6 @@ import (
 )
 
 func Execute(cmd *exec.Cmd) {
-	fmt.Println(cmd.Args)
 	stdout, err := cmd.StdoutPipe()
 	defer stdout.Close()
 	if err != nil {

@@ -13,7 +13,7 @@ func init() {
 		LongHelp: "use exploit",
 	}
 	useCommand.AddCommand(&grumble.Command{
-		Name:     "EternalBlue",
+		Name:     "Eternalblue",
 		Help:     "use EternalBlue",
 		LongHelp: "use EternalBlue",
 		Usage:    "use EternalBlue",
@@ -23,7 +23,7 @@ func init() {
 		},
 	})
 	useCommand.AddCommand(&grumble.Command{
-		Name:     "EternalChampion",
+		Name:     "Eternalchampion",
 		Help:     "use EternalChampion",
 		LongHelp: "use EternalChampion",
 		Usage:    "use EternalChampion",
@@ -33,7 +33,7 @@ func init() {
 		},
 	})
 	useCommand.AddCommand(&grumble.Command{
-		Name:     "SmbTouch",
+		Name:     "Smbtouch",
 		Help:     "use SmbTouch",
 		LongHelp: "use SmbTouch",
 		Usage:    "use SmbTouch",
@@ -53,12 +53,32 @@ func init() {
 		},
 	})
 	useCommand.AddCommand(&grumble.Command{
-		Name:     "EternalRomance",
+		Name:     "Eternalromance",
 		Help:     "use EternalRomance",
 		LongHelp: "use EternalRomance",
 		Usage:    "use EternalRomance",
 		Run: func(c *grumble.Context) error {
 			exploits.EternalRomance()
+			return nil
+		},
+	})
+	useCommand.AddCommand(&grumble.Command{
+		Name:     "Eternalsynergy",
+		Help:     "use Eternalsynergy",
+		LongHelp: "use Eternalsynergy",
+		Usage:    "use Eternalsynergy",
+		Run: func(c *grumble.Context) error {
+			exploits.EternalSynergy()
+			return nil
+		},
+	})
+	useCommand.AddCommand(&grumble.Command{
+		Name:     "Explodingcan",
+		Help:     "use Explodingcan",
+		LongHelp: "use Explodingcan",
+		Usage:    "use Explodingcan",
+		Run: func(c *grumble.Context) error {
+			exploits.ExplodingCan()
 			return nil
 		},
 	})
