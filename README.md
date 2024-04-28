@@ -13,3 +13,6 @@
 
 ## Usage
 
+![help menu](./imgs/2.png)
+
+![DoublePulsar](./imgs/1.png)
