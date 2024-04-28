@@ -9,4 +9,7 @@
 
 - Use With Proxy To Attack A Internal Target Need You To Add A Proxy Rule For The Exploit Executable File At Directory **exp_libs**.
 
+- Support EternalBlue,EternalRomance,EternalChampion,EternalSynergy,SmbTouch,DoublePulsar
+
 ## Usage
+

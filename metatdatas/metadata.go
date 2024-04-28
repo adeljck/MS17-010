@@ -101,7 +101,7 @@ func SetDefaultMetaData() {
 		for index, Project := range Projects {
 			fmt.Println(utils.ColorPrint(1, "%d.%s", index, Project))
 		}
-		fmt.Print(utils.ColorPrint(1, "Set Project Name(default 0):"))
+		fmt.Print(utils.ColorPrint(1, "Choose Project(default 0):"))
 		fmt.Scanf("%d\n", &ProjectIndex)
 		if ProjectIndex < 0 || ProjectIndex > len(Projects) {
 			fmt.Println(utils.ColorPrint(-1, "Wrong Project Index."))
@@ -110,7 +110,7 @@ func SetDefaultMetaData() {
 		}
 	}
 	ProjectName := ""
-	if ProjectIndex == 0 {
+	if ProjectIndex == len(Projects)-1 {
 		fmt.Printf(utils.ColorPrint(1, "Set Project Name(default %s):", fmt.Sprintf("z%s", MetaData.TargetIp)))
 		fmt.Scanf("%s\n", &ProjectName)
 		if ProjectName != "" {
