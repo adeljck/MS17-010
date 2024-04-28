@@ -3,10 +3,21 @@ package utils
 import (
 	"bufio"
 	"fmt"
+	"github.com/fatih/color"
 	"os/exec"
+	"strings"
 )
 
 func Execute(cmd *exec.Cmd) {
+	defer fmt.Println(color.HiGreenString("[+] Execute Finish."))
+	confirm := ""
+	fmt.Printf(color.HiBlueString("Confirm To Execute Command(y):"))
+	//ColorPrint(1, fmt.Sprintf("Confirm To Execute Command(y):"))
+	fmt.Scanf("%s\n", &confirm)
+	confirm = strings.ToLower(confirm)
+	if confirm == "n" {
+		return
+	}
 	stdout, err := cmd.StdoutPipe()
 	defer stdout.Close()
 	if err != nil {

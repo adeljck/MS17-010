@@ -15,14 +15,11 @@ func CreateLogDir(Path string) {
 	if os.IsNotExist(err) {
 		err := os.Mkdir(Path, 0755)
 		if err != nil {
-			fmt.Println("Error creating folder:", err)
 			return
 		}
 	} else if err == nil {
-		fmt.Println("Folder already exists. Skipping creation.")
 		return
 	} else {
-		fmt.Println("Error checking folder existence:", err)
 		return
 	}
 }
@@ -31,14 +28,13 @@ func CreateProject(Path string, ProjectName string) {
 	if _, err := os.Stat(projectPath); os.IsNotExist(err) {
 		err := os.MkdirAll(projectPath, 0755)
 		if err != nil {
-			fmt.Println("Error creating project folder:", err)
 			return
 		}
 	}
 
 }
 func ListDirectory(Path string) []string {
-	Projects := []string{"Create New Project"}
+	Projects := make([]string, 0)
 	d, err := os.Open(Path)
 	if err != nil {
 		fmt.Println("Error opening directory:", err)
@@ -60,6 +56,7 @@ func ListDirectory(Path string) []string {
 			Projects = append(Projects, file.Name())
 		}
 	}
+	Projects = append(Projects, "Create New Project")
 	return Projects
 }
 func CreateLog(TargetIp, LogDir, ProjectName string) {
@@ -98,8 +95,12 @@ func CreateLog(TargetIp, LogDir, ProjectName string) {
 	}
 }
 func CheckPathLegal(Path string) bool {
+	if strings.Contains(Path, ";") {
+		return false
+	}
 	_, err := os.Stat(Path)
 	if err != nil {
+		fmt.Println(err)
 		if os.IsNotExist(err) {
 			return true // Path does not exist
 		}

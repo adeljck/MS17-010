@@ -3,7 +3,6 @@ package metatdatas
 import (
 	"eternal/utils"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -60,59 +59,59 @@ var MetaData = Meta{
 		MaxSizeToCheck: "70",
 		Delay:          "0"},
 }
-var archs = []string{"x86", "x64", "unknown"}
 var eb_targets = []string{"XP", "WIN72K8R2"}
+var archs = []string{"x86", "x64"}
 var functions = []string{"OutputInstall", "Ping", "RunDLL", "RunShellcode", "Uninstall"}
 
 func SetDefaultMetaData() {
 	for {
-		fmt.Print("Set Default Target:")
+		fmt.Print(utils.ColorPrint(1, "Set Default Target:"))
 		TargetIp := ""
 		fmt.Scanf("%s\n", &TargetIp)
 		if !utils.IPChecker(TargetIp) {
-			fmt.Println("Wrong IP Address....")
+			fmt.Println(utils.ColorPrint(-1, "Wrong IP Address...."))
 		} else {
 			MetaData.TargetIp = TargetIp
 			MetaData.IIS.HostString = TargetIp
-			log.SetPrefix("[*] ")
-			log.Println("TargetIp ==> ", MetaData.TargetIp)
-			log.Println("HostString ==> ", MetaData.TargetIp)
+			fmt.Println(utils.ColorPrint(0, "TargetIp ==> %s", MetaData.TargetIp))
+			fmt.Println(utils.ColorPrint(0, "HostString ==> %s", MetaData.TargetIp))
 			MetaData.ProjectName = fmt.Sprintf("z%s", MetaData.TargetIp)
 			break
 		}
 	}
 	LogDir := ""
 	for {
-		fmt.Print("Set Base Log Dir(Default ./logs/):")
+		fmt.Print(utils.ColorPrint(1, "Set Base Log Dir(Default ./logs/):"))
 		fmt.Scanf("%s\n", &LogDir)
 		if utils.CheckPathLegal(LogDir) {
 			break
+		} else {
+			fmt.Println(utils.ColorPrint(-1, "Wrong Log Directory..."))
 		}
 	}
 	if LogDir != "" {
 		MetaData.LogDir = LogDir
 	}
-	log.SetPrefix("[*] ")
-	log.Println("LogDir ==> ", MetaData.LogDir)
+	fmt.Println(utils.ColorPrint(0, "LogDir ==> %s", MetaData.LogDir))
 	utils.CreateLogDir(MetaData.LogDir)
 	Projects := utils.ListDirectory(MetaData.LogDir)
 	ProjectIndex := 0
 	for {
 
 		for index, Project := range Projects {
-			fmt.Printf("%d.%s\n", index, Project)
+			fmt.Println(utils.ColorPrint(1, "%d.%s", index, Project))
 		}
-		fmt.Print("Set Project Name(default 0):")
+		fmt.Print(utils.ColorPrint(1, "Set Project Name(default 0):"))
 		fmt.Scanf("%d\n", &ProjectIndex)
 		if ProjectIndex < 0 || ProjectIndex > len(Projects) {
-			fmt.Println("Wrong Project Index.")
+			fmt.Println(utils.ColorPrint(-1, "Wrong Project Index."))
 		} else {
 			break
 		}
 	}
 	ProjectName := ""
 	if ProjectIndex == 0 {
-		fmt.Printf("Set Project Name(default %s):", fmt.Sprintf("z%s", MetaData.TargetIp))
+		fmt.Printf(utils.ColorPrint(1, "Set Project Name(default %s):", fmt.Sprintf("z%s", MetaData.TargetIp)))
 		fmt.Scanf("%s\n", &ProjectName)
 		if ProjectName != "" {
 			MetaData.ProjectName = ProjectName
@@ -120,26 +119,24 @@ func SetDefaultMetaData() {
 	} else {
 		MetaData.ProjectName = Projects[ProjectIndex]
 	}
-	log.SetPrefix("[*] ")
-	log.Println("Project ==> ", fmt.Sprintf("%s", MetaData.ProjectName))
+	fmt.Println(utils.ColorPrint(0, "Project ==> %s", fmt.Sprintf("%s", MetaData.ProjectName)))
 	utils.CreateProject(MetaData.LogDir, MetaData.ProjectName)
-	log.SetPrefix("[*] ")
-	log.Println("Set Target Directory ==> ", fmt.Sprintf("z%s", MetaData.TargetIp))
+	fmt.Println(utils.ColorPrint(0, "Set Target Directory ==> %s", fmt.Sprintf("z%s", MetaData.TargetIp)))
 	utils.CreateProject(filepath.Join(MetaData.LogDir, MetaData.ProjectName), fmt.Sprintf("z%s", MetaData.TargetIp))
 	utils.CreateLog(MetaData.TargetIp, MetaData.LogDir, MetaData.ProjectName)
 }
 func (M *Meta) SetShellcodeFile() {
 	ShellcodeFile := ""
 	for {
-		fmt.Printf("Set DOUP ShellcodeFile:")
+		fmt.Printf(utils.ColorPrint(1, "Set DOUP ShellcodeFile:"))
 		fmt.Scanf("%s\n", &ShellcodeFile)
 		if ShellcodeFile == "" || !utils.CheckPathLegal(ShellcodeFile) {
-			fmt.Println("Wrong Shellcode File Path ")
+			fmt.Println(utils.ColorPrint(-1, "Wrong Shellcode File Path "))
 			continue
 		} else {
 			_, err := os.Stat(ShellcodeFile)
 			if os.IsNotExist(err) {
-				fmt.Println("Shellcode File Not Exists.")
+				fmt.Println(utils.ColorPrint(-1, "Shellcode File Not Exists."))
 				continue
 			}
 			M.ShellcodeFile = ShellcodeFile
@@ -147,87 +144,126 @@ func (M *Meta) SetShellcodeFile() {
 			break
 		}
 	}
-	M.ShellcodeBuffer = utils.BinToHex(M.ShellcodeFile)
-	fmt.Println("ShellcodeFile ==> " + M.ShellcodeFile)
+	fmt.Println(utils.ColorPrint(0, "ShellcodeFile ==> "+M.ShellcodeFile))
+	fmt.Println(utils.ColorPrint(0, "ShellcodeBuffer ==> "+M.ShellcodeFile))
 
 }
 func (M *Meta) SetTargetPort() {
-	fmt.Printf("Set TargetPort:")
-	fmt.Scanf("%s\n", &M.TargetPort)
-	fmt.Println("TargetPort ==> " + M.TargetPort)
+	TargetPort := ""
+	for {
+		fmt.Printf(utils.ColorPrint(1, "Set TargetPort:"))
+		fmt.Scanf("%s\n", &TargetPort)
+		results, err := strconv.Atoi(TargetPort)
+		if err != nil {
+			fmt.Println(utils.ColorPrint(-1, "Wrong Input"))
+			continue
+		}
+		if results < 0 || results > 65535 {
+			fmt.Println(utils.ColorPrint(-1, "Wrong Input"))
+			continue
+		}
+		M.TargetPort = TargetPort
+		break
+	}
+	fmt.Println(utils.ColorPrint(0, "TargetPort ==> "+M.TargetPort))
 }
 func (M *Meta) SetTargetIp() {
 	TargetIp := ""
 	for {
-		fmt.Printf("Set TargetIp:")
+		fmt.Printf(utils.ColorPrint(1, "Set TargetIp:"))
 		fmt.Scanf("%s\n", &TargetIp)
 		if !utils.IPChecker(TargetIp) {
-			fmt.Println("Wrong IP Address.")
+			fmt.Println(utils.ColorPrint(-1, "Wrong IP Address."))
 			continue
 		} else {
 			M.TargetIp = TargetIp
 			break
 		}
 	}
-	fmt.Println("TargetIp ==> " + M.TargetIp)
+	fmt.Println(utils.ColorPrint(0, "TargetIp ==> "+M.TargetIp))
 }
 func (M *Meta) SetNetworkTimeout() {
-	fmt.Printf("Set NetworkTimeout:")
-	fmt.Scanf("%s\n", &M.NetworkTimeout)
-	fmt.Println("NetworkTimeout ==> " + M.NetworkTimeout)
+	NetworkTimeout := ""
+	for {
+		fmt.Printf(utils.ColorPrint(1, "Set NetworkTimeout:"))
+		fmt.Scanf("%s\n", &NetworkTimeout)
+		results, err := strconv.Atoi(NetworkTimeout)
+		if err != nil {
+			fmt.Println(utils.ColorPrint(-1, "Wrong Input"))
+			continue
+		}
+		if results < 1 {
+			fmt.Println(utils.ColorPrint(-1, "Wrong Input"))
+			continue
+		}
+		M.NetworkTimeout = NetworkTimeout
+		break
+	}
+	fmt.Println(utils.ColorPrint(0, "NetworkTimeout ==> "+M.NetworkTimeout))
 }
 func (M *Meta) SetDLLPath() {
 	DLLPath := ""
-	fmt.Printf("Set DLLPath(%s):", M.DLLPath)
+	fmt.Printf(utils.ColorPrint(1, "Set DLLPath(%s):", M.DLLPath))
 	fmt.Scanf("%s\n", &DLLPath)
 	if DLLPath == "" {
-		fmt.Println("DLLPath ==> " + M.DLLPath)
+		fmt.Println(utils.ColorPrint(0, "DLLPath ==> "+M.DLLPath))
 		return
 	} else {
 		M.DLLPath = DLLPath
 	}
-	fmt.Println("DLLPath ==> " + M.DLLPath)
+	fmt.Println(utils.ColorPrint(0, "DLLPath ==> "+M.DLLPath))
 }
 func (M *Meta) SetArch() {
 	arch := -1
-	fmt.Printf("0.x86\n1.x64\nSeletc Arch(%s):", M.Arch)
+	fmt.Printf(utils.ColorPrint(1, "0.x86\n1.x64\nSeletc Arch(Default is %s):", M.Arch))
 	fmt.Scanf("%d\n", &arch)
 	if arch == -1 {
-		fmt.Println("Arch ==> " + M.Arch)
+		fmt.Println(utils.ColorPrint(0, "Arch ==> "+M.Arch))
+		return
+	}
+	if arch < 0 || arch > len(archs) {
+		fmt.Println(utils.ColorPrint(0, "Arch ==> "+M.Arch))
 		return
 	}
 	M.Arch = archs[arch]
-	fmt.Println("Arch ==> " + M.Arch)
+	fmt.Println(utils.ColorPrint(0, "Arch ==> "+M.Arch))
 }
 func (M *Meta) SetTarget(exp string) {
 	if exp == "eb" {
 		target := 1
-		fmt.Printf("0) XP\n1) WIN72K8R2\nSelect Target(%s):", eb_targets[target])
+		fmt.Printf(utils.ColorPrint(1, fmt.Sprintf("0) XP\n1) WIN72K8R2\nSelect Target(%s):", eb_targets[target])))
 		fmt.Scanf("%d\n", &target)
 		M.Target = eb_targets[target]
 	}
-	fmt.Println("Target ==> " + M.Target)
+	fmt.Println(utils.ColorPrint(0, "Target ==> "+M.Target))
 }
 func (M *Meta) SetFunction() {
 	function := 1
-	fmt.Printf("0.OutputInstall\n1.Ping\n2.RunDLL\n3.RunShellcode\n4.Uninstall\nSeletc Function(%s):", functions[function])
-	fmt.Scanf("%d\n", &function)
-	M.Function = functions[function]
-	fmt.Println("Function ==> " + M.Function)
+	for {
+		fmt.Printf(utils.ColorPrint(1, fmt.Sprintf("0.OutputInstall\n1.Ping\n2.RunDLL\n3.RunShellcode\n4.Uninstall\nSeletc Function(%s):", functions[function])))
+		fmt.Scanf("%d\n", &function)
+		if function < 0 || function > len(functions) {
+			fmt.Println(utils.ColorPrint(-1, "Wrong Input"))
+			continue
+		}
+		M.Function = functions[function]
+		break
+	}
+	fmt.Println(utils.ColorPrint(0, "Function ==> "+M.Function))
 }
 func (M *Meta) SetOutputInstall() {
 	OutputInstall := ""
 	for {
-		fmt.Printf("Input OutputInstall Path(%s):", M.OutputInstall)
+		fmt.Printf(utils.ColorPrint(1, "Input OutputInstall Path(%s):", M.OutputInstall))
 		fmt.Scanf("%s\n", &OutputInstall)
 		if OutputInstall == "" || !utils.CheckPathLegal(OutputInstall) {
-			fmt.Println("Wrong OutputInstall Path.")
+			fmt.Println(utils.ColorPrint(-1, "[-] Wrong OutputInstall Path."))
 			continue
 		}
+		M.OutputInstall = OutputInstall
 		break
 	}
-	M.OutputInstall = OutputInstall
-	fmt.Println("OutputInstall ==> " + M.OutputInstall)
+	fmt.Println(utils.ColorPrint(0, "OutputInstall ==> "+M.OutputInstall))
 }
 func (M Meta) ShowMetaData() {
 	var typeInfo = reflect.TypeOf(M)
@@ -239,13 +275,13 @@ func (M Meta) ShowMetaData() {
 		if key == "ShellcodeBuffer" {
 			val = "..."
 		}
-		fmt.Printf("%v ==> %v\n", key, val)
+		fmt.Println(utils.ColorPrint(0, fmt.Sprintf("%v ==> %v", key, val)))
 	}
 }
 func (M *Meta) SetEnableSSL() {
 	EnableSSL := ""
 	for {
-		fmt.Print("Set EnableSSL(default is false):")
+		fmt.Print(utils.ColorPrint(1, "Set EnableSSL(default is false):"))
 		fmt.Scanf("%s\n", &EnableSSL)
 		EnableSSL = strings.ToLower(EnableSSL)
 		if EnableSSL == "" {
@@ -255,17 +291,17 @@ func (M *Meta) SetEnableSSL() {
 			EnableSSL = "true"
 			break
 		} else {
-			fmt.Println("Wrong Input,Input True or False or Stay Default.")
+			fmt.Println(utils.ColorPrint(-1, "Wrong Input,Input True or False or Stay Default."))
 			continue
 		}
 	}
 	M.IIS.EnableSSL = EnableSSL
-	fmt.Println("EnableSSL ==> " + M.IIS.EnableSSL)
+	fmt.Println(utils.ColorPrint(0, "EnableSSL ==> "+M.IIS.EnableSSL))
 }
 func (M *Meta) SetIisPort() {
 	IisPort := ""
 	for {
-		fmt.Print("Set IisPort(default is 80):")
+		fmt.Print(utils.ColorPrint(1, "Set IisPort(default is 80):"))
 		fmt.Scanf("%s\n", &IisPort)
 		if IisPort == "" {
 			IisPort = "80"
@@ -273,23 +309,23 @@ func (M *Meta) SetIisPort() {
 		} else {
 			port, err := strconv.Atoi(IisPort)
 			if err != nil {
-				fmt.Println("Wrong Input,Input Iis Port Number or Stay Default.")
+				fmt.Println(utils.ColorPrint(-1, "[-] Wrong Input,Input Iis Port Number or Stay Default."))
 				continue
 			}
 			if port < 0 || port > 65535 {
-				fmt.Println("Wrong Input,Input Iis Port Number Out Of Range.")
+				fmt.Println(utils.ColorPrint(-1, "[-] Wrong Input,Input Iis Port Number Out Of Range."))
 				continue
 			}
 			break
 		}
 	}
 	M.IIS.Port = IisPort
-	fmt.Println("IisPort ==> " + M.IIS.Port)
+	fmt.Println(utils.ColorPrint(0, "IisPort ==> "+M.IIS.Port))
 }
 func (M *Meta) SetHostString() {
 	HostString := ""
 	for {
-		fmt.Printf("Set HostString(default is TargetIP %s):", M.TargetIp)
+		fmt.Printf(utils.ColorPrint(1, "Set HostString(default is TargetIP %s):", M.TargetIp))
 		fmt.Scanf("%s\n", &HostString)
 		if HostString == "" {
 			HostString = M.TargetIp
@@ -297,5 +333,5 @@ func (M *Meta) SetHostString() {
 		}
 	}
 	M.IIS.HostString = HostString
-	fmt.Println("HostString ==> " + M.IIS.HostString)
+	fmt.Println(utils.ColorPrint(0, "HostString ==> "+M.IIS.HostString))
 }
