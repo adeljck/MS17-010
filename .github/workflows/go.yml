@@ -1,0 +1,72 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main  # 触发条件可以根据你的实际情况进行调整
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # 这里使用 Ubuntu 系统，但构建 Windows 64 位版本时会在 Windows 环境下执行
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17
+
+    - name: Build and compress binary
+      run: |
+        GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o eternal.exe ./main.go
+        upx --brute eternal.exe
+
+    - name: Copy lib directory
+      run: cp -r lib/ ./lib
+
+    - name: Package release artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: release
+        path: |
+          eternal.exe
+          lib/
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download release artifacts
+      uses: actions/download-artifact@v2
+      with:
+        name: release
+        path: .
+
+    - name: Zip release artifacts
+      run: zip -r eternal_windows_amd64.zip eternal.exe lib/
+
+    - name: Create release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.sha }}
+        release_name: Release ${{ github.sha }}
+        body: |
+          Release for commit ${{ github.sha }}
+        draft: false
+        prerelease: false
+
+    - name: Upload release assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./eternal_windows_amd64.zip
+        asset_name: eternal_windows_amd64.zip
+        asset_content_type: application/zip
