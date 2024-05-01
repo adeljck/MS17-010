@@ -57,10 +57,10 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.sha }}
-        release_name: Release ${{ github.sha }}
+        tag_name: Laetst
+        release_name: Latest Release
         body: |
-          Release for commit ${{ github.sha }}
+          Release for commit Latest Release
         draft: false
         prerelease: false
 
