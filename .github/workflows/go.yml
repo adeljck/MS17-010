@@ -57,8 +57,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.sha }}
-        release_name: Release ${{ github.sha }}
+        tag_name: ${{ github.md5 }}
+        release_name: Release ${{ github.md5 }}
         body: |
           Release for commit ${{ github.sha }}
         draft: false
