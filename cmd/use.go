@@ -82,5 +82,15 @@ func init() {
 			return nil
 		},
 	})
+	useCommand.AddCommand(&grumble.Command{
+		Name:     "NamedPipeTouch",
+		Help:     "use NamedPipeTouch",
+		LongHelp: "use NamedPipeTouch",
+		Usage:    "use NamedPipeTouch",
+		Run: func(c *grumble.Context) error {
+			touches.NamePipeTouch()
+			return nil
+		},
+	})
 	App.AddCommand(useCommand)
 }

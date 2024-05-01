@@ -12,7 +12,6 @@ func Execute(cmd *exec.Cmd) {
 	defer fmt.Println(color.HiGreenString("[+] Execute Finish."))
 	confirm := ""
 	fmt.Printf(color.HiBlueString("Confirm To Execute Command(y):"))
-	//ColorPrint(1, fmt.Sprintf("Confirm To Execute Command(y):"))
 	fmt.Scanf("%s\n", &confirm)
 	confirm = strings.ToLower(confirm)
 	if confirm == "n" {
