@@ -92,5 +92,35 @@ func init() {
 			return nil
 		},
 	})
+	useCommand.AddCommand(&grumble.Command{
+		Name:     "RpcTouch",
+		Help:     "use RpcTouch",
+		LongHelp: "use RpcTouch",
+		Usage:    "use RpcTouch",
+		Run: func(c *grumble.Context) error {
+			touches.RpcTouch()
+			return nil
+		},
+	})
+	useCommand.AddCommand(&grumble.Command{
+		Name:     "EclipseWingTouch",
+		Help:     "use EclipseWingTouch",
+		LongHelp: "use EclipseWingTouch",
+		Usage:    "use EclipseWingTouch",
+		Run: func(c *grumble.Context) error {
+			touches.EclipseWingTouch()
+			return nil
+		},
+	})
+	useCommand.AddCommand(&grumble.Command{
+		Name:     "EclipseWing",
+		Help:     "use EclipseWing",
+		LongHelp: "use EclipseWing",
+		Usage:    "use EclipseWing",
+		Run: func(c *grumble.Context) error {
+			exploits.EclipseWing()
+			return nil
+		},
+	})
 	App.AddCommand(useCommand)
 }

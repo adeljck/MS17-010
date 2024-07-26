@@ -1,0 +1,5 @@
+package touches
+
+func RpcTouch() {
+
+}
