@@ -256,11 +256,20 @@ func (M *Meta) SetOutputInstall() {
 	for {
 		fmt.Printf(utils.ColorPrint(1, "Input OutputInstall Path(%s):", M.OutputInstall))
 		fmt.Scanf("%s\n", &OutputInstall)
-		if OutputInstall == "" || !utils.CheckPathLegal(OutputInstall) {
+		if (M.OutputInstall == "" && OutputInstall == "") || !utils.CheckPathLegal(OutputInstall) {
 			fmt.Println(utils.ColorPrint(-1, "[-] Wrong OutputInstall Path."))
 			continue
 		}
-		M.OutputInstall = OutputInstall
+		if !(OutputInstall == "" && M.OutputInstall != "") {
+			M.OutputInstall = OutputInstall
+		}
+		_, err := os.Stat(M.OutputInstall)
+		if os.IsNotExist(err) {
+			fmt.Println(utils.ColorPrint(-1, "Shellcode File Not Exists."))
+			continue
+		}
+		M.ShellcodeFile = OutputInstall
+		M.ShellcodeBuffer = utils.BinToHex(OutputInstall)
 		break
 	}
 	fmt.Println(utils.ColorPrint(0, "OutputInstall ==> "+M.OutputInstall))
