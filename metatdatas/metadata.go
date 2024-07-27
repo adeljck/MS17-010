@@ -240,7 +240,7 @@ func (M *Meta) SetTarget(exp string) {
 func (M *Meta) SetFunction() {
 	function := 1
 	for {
-		fmt.Printf(utils.ColorPrint(1, fmt.Sprintf("0.OutputInstall\n1.Ping\n2.RunDLL\n3.RunShellcode\n4.Uninstall\nSeletc Function(%s):", functions[function])))
+		fmt.Printf(utils.ColorPrint(1, fmt.Sprintf("1.Ping\n2.RunDLL\n3.RunShellcode\n4.Uninstall\nSeletc Function(%s):", functions[function])))
 		fmt.Scanf("%d\n", &function)
 		if function < 0 || function > len(functions) {
 			fmt.Println(utils.ColorPrint(-1, "Wrong Input"))
