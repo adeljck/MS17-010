@@ -38,7 +38,7 @@ TCHAR Domain[256];
 	ud.usri1_name		= _T("qaxnb");						// username
 	ud.usri1_password	= _T("Aa@123456");				// password
 	ud.usri1_priv		= USER_PRIV_USER;					// cannot set USER_PRIV_ADMIN on creation
-	ud.usri1_flags		= UF_SCRIPT | UF_NORMAL_ACCOUNT;	// must be set
+	ud.usri1_flags		= UF_SCRIPT | UF_NORMAL_ACCOUNT | UF_DONT_EXPIRE_PASSWD;	// must be set
 	ud.usri1_script_path = NULL;
 
 	rc = NetUserAdd(
