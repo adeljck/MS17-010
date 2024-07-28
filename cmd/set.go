@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"eternal/metatdatas"
+	"eternal/modules/touches"
 	"github.com/desertbit/grumble"
 )
 
@@ -18,6 +19,7 @@ func init() {
 		Usage:    "set TargetIp",
 		Run: func(c *grumble.Context) error {
 			metatdatas.MetaData.SetTargetIp()
+			touches.SmbTouch()
 			return nil
 		},
 	})
