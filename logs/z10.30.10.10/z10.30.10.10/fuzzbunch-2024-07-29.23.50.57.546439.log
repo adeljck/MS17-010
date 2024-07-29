@@ -1,7 +1,0 @@
-
-[*] Initializing Global State
-[+] Set TargetIp => 10.30.10.10
-[+] Set CallbackIp => 127.0.0.1
-
-[!] Redirection OFF
-[+] Set LogDir => C:\Users\adelj\GolandProjects\MS17-010\logs\z10.30.10.10\z10.30.10.10
