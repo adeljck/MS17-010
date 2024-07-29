@@ -1,38 +1,26 @@
 #include <windows.h>
 
+void SetRegistryValue(HKEY hKeyRoot, LPCSTR subKey, LPCSTR valueName, DWORD value)
+{
+    HKEY hKey;
+    LONG result;
+    result = RegOpenKeyExA(hKeyRoot, subKey, 0, KEY_SET_VALUE, &hKey);
+    if (result != ERROR_SUCCESS) {
+        return;
+    }
+    result = RegSetValueExA(hKey, valueName, 0, REG_DWORD, (const BYTE*)&value, sizeof(value));
+    if (result != ERROR_SUCCESS) {
+        RegCloseKey(hKey);
+        return;
+    }
+    RegCloseKey(hKey);
+}
 
 DWORD EnableRDPServiceInternal(void)
 
 {
-    HKEY hKey = NULL;
-    if (RegOpenKeyEx(
-        HKEY_LOCAL_MACHINE,
-        "SYSTEM\\CurrentControlSet\\Control\\Terminal Server",
-        0,
-        KEY_WRITE,
-        &hKey) != ERROR_SUCCESS)
-    {
-        return -1;
-    }
-
-    // Set the value to enable RDP
-    DWORD dwValue = 0;
-
-    if (RegSetValueEx(
-        hKey,
-        "fDenyTSConnections",
-        0,
-        REG_DWORD,
-        (LPBYTE)&dwValue, 
-        sizeof(dwValue)) != ERROR_SUCCESS)
-    {
-        return -1;
-    }
-    else {
-        RegCloseKey(hKey);
-    }
-
-    
+    SetRegistryValue(HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\Lsa", "LimitBlankPasswordUse", 0);
+    SetRegistryValue(HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\Terminal Server", "fDenyTSConnections", 0);
     return 0;
 }
 

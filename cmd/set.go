@@ -3,8 +3,6 @@ package cmd
 import (
 	"eternal/metatdatas"
 	"eternal/modules/touches"
-	"eternal/utils"
-	"fmt"
 	"github.com/desertbit/grumble"
 )
 
@@ -22,13 +20,6 @@ func init() {
 		Run: func(c *grumble.Context) error {
 			metatdatas.MetaData.SetTargetIp()
 			touches.SmbTouch()
-			if utils.CheckDefaultRDPPort(metatdatas.MetaData.TargetIp, "3389") {
-				fmt.Println(utils.ColorPrint(1, "RDP port In 3389 Inject RDPbl.dll To Enable Blank Password"))
-
-			} else {
-				fmt.Println(utils.ColorPrint(1, "Inject RDP.dll AND RDPbl.dll To Enable RDP ANd Blank Password"))
-
-			}
 			return nil
 		},
 	})
