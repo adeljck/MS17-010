@@ -1,0 +1,42 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main  # 你可以根据需要更改为你使用的分支
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.20'  # 根据你的 Go 版本进行调整
+
+    - name: Install UPX
+      run: sudo apt-get install -y upx
+
+    - name: Build the application
+      run: |
+        GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o eternal.exe ./main.go
+        upx -9 eternal.exe
+
+    - name: Create ZIP file
+      run: |
+        mkdir -p release
+        cp eternal.exe release/
+        cp -r lib release/
+        cp -r dlls release/
+        cd release
+        zip -r Eternal.zip ./*
+
+    - name: Upload release asset
+      uses: softprops/action-gh-release@v1
+      with:
+        files: release/Eternal.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
