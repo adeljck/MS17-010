@@ -42,6 +42,7 @@ jobs:
       id: tag
       run: |
         TAG_NAME="v${{ env.RELEASE_DATE }}"
+        echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
         git tag $TAG_NAME
         git push origin $TAG_NAME
       env:
@@ -50,8 +51,8 @@ jobs:
     - name: Create Release
       uses: actions/create-release@v1
       with:
-        tag_name: ${{ steps.tag.outputs.tag_name }}
-        release_name: Release ${{ steps.tag.outputs.tag_name }}
+        tag_name: ${{ env.TAG_NAME }}
+        release_name: Release ${{ env.TAG_NAME }}
         body: |
           This release includes the following:
           - Built binary: eternal.exe
