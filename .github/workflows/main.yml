@@ -1,9 +1,9 @@
-name: Build and Release
+name: Build And Package
 
 on:
   push:
     branches:
-      - main  # 你可以根据需要更改为你使用的分支
+      - main  # 根据你的实际情况设置分支
 
 jobs:
   build:
@@ -15,7 +15,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: '1.20'  # 根据你的 Go 版本进行调整
+        go-version: '1.20'  # 根据需要调整Go版本
 
     - name: Install UPX
       run: sudo apt-get install -y upx
@@ -33,6 +33,16 @@ jobs:
         cp -r dlls release/
         cd release
         zip -r Eternal.zip ./*
+
+    - name: Get current date
+      id: date
+      run: echo "RELEASE_DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
+
+    - name: Create Release Tag
+      id: tag
+      run: |
+        git tag v${{ steps.date.outputs.RELEASE_DATE }}
+        git push origin v${{ steps.date.outputs.RELEASE_DATE }}
 
     - name: Upload release asset
       uses: softprops/action-gh-release@v1
