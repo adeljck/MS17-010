@@ -1,4 +1,4 @@
-package metatdatas
+package metadatas
 
 import (
 	"eternal/utils"

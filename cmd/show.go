@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"eternal/metatdatas"
+	"eternal/metadatas"
 	"github.com/desertbit/grumble"
 )
 
@@ -17,7 +17,7 @@ func init() {
 		LongHelp: "show options",
 		Usage:    "show options",
 		Run: func(c *grumble.Context) error {
-			metatdatas.MetaData.ShowMetaData()
+			metadatas.MetaData.ShowMetaData()
 			return nil
 		},
 	})

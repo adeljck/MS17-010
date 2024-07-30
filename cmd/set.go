@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"eternal/metatdatas"
+	"eternal/metadatas"
 	"eternal/modules/touches"
 	"github.com/desertbit/grumble"
 )
@@ -18,7 +18,7 @@ func init() {
 		LongHelp: "set TargetIp",
 		Usage:    "set TargetIp",
 		Run: func(c *grumble.Context) error {
-			metatdatas.MetaData.SetTargetIp()
+			metadatas.MetaData.SetTargetIp()
 			touches.SmbTouch()
 			return nil
 		},
@@ -29,7 +29,7 @@ func init() {
 		LongHelp: "set NetworkTimeout",
 		Usage:    "set NetworkTimeout",
 		Run: func(c *grumble.Context) error {
-			metatdatas.MetaData.SetNetworkTimeout()
+			metadatas.MetaData.SetNetworkTimeout()
 			return nil
 		},
 	})
@@ -39,7 +39,7 @@ func init() {
 		LongHelp: "set TargetPort",
 		Usage:    "set TargetPort",
 		Run: func(c *grumble.Context) error {
-			metatdatas.MetaData.SetTargetPort()
+			metadatas.MetaData.SetTargetPort()
 			return nil
 		},
 	})
@@ -49,7 +49,7 @@ func init() {
 	//	LongHelp: "set Target",
 	//	Usage:    "set Target",
 	//	Run: func(c *grumble.Context) error {
-	//		metatdatas.MetaData.SetTarget("*")
+	//		metadatas.MetaData.SetTarget("*")
 	//		return nil
 	//	},
 	//})
@@ -59,7 +59,7 @@ func init() {
 	//	LongHelp: "set DLLPath",
 	//	Usage:    "set DLLPath",
 	//	Run: func(c *grumble.Context) error {
-	//		metatdatas.MetaData.SetDLLPath()
+	//		metadatas.MetaData.SetDLLPath()
 	//		return nil
 	//	},
 	//})
@@ -69,7 +69,7 @@ func init() {
 	//	LongHelp: "set Arch",
 	//	Usage:    "set Arch",
 	//	Run: func(c *grumble.Context) error {
-	//		metatdatas.MetaData.SetArch()
+	//		metadatas.MetaData.SetArch()
 	//		return nil
 	//	},
 	//})

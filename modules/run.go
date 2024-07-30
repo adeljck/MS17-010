@@ -3,7 +3,7 @@ package modules
 import (
 	"eternal/cmd"
 	"eternal/conf"
-	"eternal/metatdatas"
+	"eternal/metadatas"
 	"eternal/utils"
 	"fmt"
 	"github.com/desertbit/grumble"
@@ -21,6 +21,6 @@ func Run() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	metatdatas.SetDefaultMetaData()
+	metadatas.SetDefaultMetaData()
 	grumble.Main(cmd.App)
 }
