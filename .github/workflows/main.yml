@@ -1,9 +1,9 @@
-name: Build And Package
+name: Build and Package
 
 on:
   push:
     branches:
-      - main  # 根据你的实际情况设置分支
+      - main  # 你可以根据需要更改为你使用的分支
 
 jobs:
   build:
@@ -15,7 +15,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: '1.20'  # 根据需要调整Go版本
+        go-version: '1.20'  # 根据你的 Go 版本进行调整
 
     - name: Install UPX
       run: sudo apt-get install -y upx
@@ -41,12 +41,32 @@ jobs:
     - name: Create Release Tag
       id: tag
       run: |
-        git tag v${{ steps.date.outputs.RELEASE_DATE }}
-        git push origin v${{ steps.date.outputs.RELEASE_DATE }}
+        TAG_NAME="v${{ env.RELEASE_DATE }}"
+        git tag $TAG_NAME
+        git push origin $TAG_NAME
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Create Release
+      uses: actions/create-release@v1
+      with:
+        tag_name: ${{ steps.tag.outputs.tag_name }}
+        release_name: Release ${{ steps.tag.outputs.tag_name }}
+        body: |
+          This release includes the following:
+          - Built binary: eternal.exe
+          - Libraries and DLLs
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Upload release asset
-      uses: softprops/action-gh-release@v1
+      uses: actions/upload-release-asset@v1
       with:
-        files: release/Eternal.zip
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: release/Eternal.zip
+        asset_name: Eternal.zip
+        asset_content_type: application/zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
